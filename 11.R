@@ -1,4 +1,4 @@
-setwd("C:/Users/Faye/桌面/assign")
+setwd("C:/Users/r0823957/Downloads")
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 # Advanced Life insurance mathematics: #
@@ -16,11 +16,15 @@ library(gridExtra)
 library(astsa)
 library(MultiMoMo)
 library(abind)
+library(spaMM)
+library(foreach)
 
 source('fitModels.R')
 source('simModels.R')
+source('life_exp.R')
 
 females<- read.table("females.csv", sep=",",head=TRUE)
+colnames(females)[1] <- c("Year")
 males<- read.table("males.csv", sep=",",head=TRUE)
 
 ####--2019, RW, original model####
@@ -100,7 +104,7 @@ le_yv   <- 1971:2071
 le_ages <- c(0,65)
 le_type <- c("per", "coh")
 dimnames(m_rate) <- list(0:90, 1971:2191, 1:10001)
-le_fem <- life_exp(le_yv, le_type, le_ages, m_rate)
+le_fem_19 <- life_exp(le_yv, le_type, le_ages, m_rate)
 
 
 dimnames(dtx) <- list(1971:2019, 0:90)
@@ -109,7 +113,7 @@ dimnames(etx) <- list(1971:2019, 0:90)
 kannisto_nages <- 30
 kannisto_nobs  <- 11
 m_obs_cl <- close_obs_death_rates(dtx, etx, kannisto_nages, kannisto_nobs)
-plot_life_exp(le_yv, 0, le_fem, "Female", le_type, "99%", m_obs = m_obs_cl)
+le_e0_19 <- plot_life_exp(le_yv, 0, le_fem_19, "Female", le_type, "99%", m_obs = m_obs_cl)
 
 
 ####--2020, RW####
@@ -283,3 +287,8 @@ le_e0_21 <- plot_life_exp(le_yv, 0, le_fem_21, "Female", le_type, "99%", m_obs =
 le_e65_21 <- plot_life_exp(le_yv, 65, le_fem_21, "Female", le_type, "99%", m_obs = m_obs_cl)
 le_e0_21
 le_e65_21
+
+##
+saveRDS(le_fem_19, file = "le_19.rds")
+AA <- readRDS("le_19.rds")
+
